@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+var messages = make([]string, 0)
+
 func main() {
 	port := ":5000"
 	server, err := socketio.NewServer(nil)
@@ -13,8 +15,13 @@ func main() {
 		panic(err)
 	}
 	server.On("connection", func (so socketio.Socket) {
+		so.Join("chat")
+		for _, m := range messages {
+			so.Emit("chat message", m)
+		}
 		log.Printf("connected from %s", so.Request().RemoteAddr)
 		so.On("chat message", func(msg string) {
+			messages = append(messages, msg)
 			so.Emit("chat message", msg)
 			log.Printf("chat: %s", msg)
 			so.BroadcastTo("chat", "chat message", msg)

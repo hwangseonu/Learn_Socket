@@ -1,39 +1,54 @@
 <!DOCTYPE html>
-<html>
 <head lang="ko">
     <meta charset="utf-8" />
-    <title>Socket.IO chat</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font: 13px Helvetica, Arial; }
-        form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-        form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-        form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-        #messages { list-style-type: none; margin: 0; padding: 0; }
-        #messages li { padding: 5px 10px; }
-        #messages li:nth-child(odd) { background: #eee; }
-    </style>
+    <title>Socket IO</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 </head>
 <body>
-<ul id="messages"></ul>
-<form action="">
-    <input id="m" autocomplete="off" /><button>Send</button>
-</form>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.dev.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script>
-    var socket = io();
-    $('form').submit(function(){
-        socket.emit('chat message with ack', $('#m').val(), function(data){
-            $('#messages').append($('<li>').text('ACK CALLBACK: ' + data));
+    <table id="messages" class="table table-striped">
+        <tbody>
+        <tr v-for="message in messages">
+            <td>{{ message }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="footer navbar-fixed-bottom">
+        <form @submit.prevent="sendMessage">
+            <div class="input-group">
+                <span class="input-group-addon">text</span>
+                <input type="text" name="message" v-model="message" class="form-control"/>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.dev.js"></script>
+    <script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
+    <script>
+        var socket = io();
+        var messages = new Vue({
+            el: '#messages',
+            data: {
+                messages: ["mocha", "127"]
+            }
         });
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
-        return false;
-    });
-    socket.on('chat message', function(msg){
-        $('#messages').append($('<li>').text(msg));
-    });
-</script>
+        var form = new Vue({
+            el: 'form',
+            data: {
+                message: ''
+            },
+            methods: {
+                sendMessage: function () {
+                    if (this.message === '') return;
+                    socket.emit('chat message', this.message);
+                    this.message = '';
+                }
+            }
+        });
+        socket.on('chat message', function (message) {
+            messages.messages.push(message)
+        });
+    </script>
 </body>
-</html>

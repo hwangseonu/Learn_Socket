@@ -1,2 +1,2 @@
-# SocketIO
-socketio 를 공부하기 위해 만든 프로그램
+# socketio
+socketio 를 공부하기 위해 만든 go프로그램

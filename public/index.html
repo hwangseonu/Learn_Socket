@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<head lang="ko">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Socket IO</title>
+  <link rel="stylesheet" href="stylesheets/stylesheet.css">
+</head>
+<body>
+  <div class="messages">
+    <ul class="msg-list">
+    </ul>
+  </div>
+  <form class="message-form">
+    <div class="message-box">
+      <input class="message">
+      <button type="submit" class="submit">보내기</button>
+    </div>
+  </form>
+  <script src="javascripts/socket.io.js"></script>
+  <script src="javascripts/jquery.js"></script>
+  <script>
+    var socket = io();
+
+    $('.message-form').submit(function () {
+      const msg = $('.message').val();
+      socket.emit('chat message', msg);
+      $('.message').val('');
+      return false;
+    });
+
+    socket.on('chat message', function (message) {
+      console.log(message);
+      $('.msg-list').append($('<li>').text(message));
+    });
+  </script>
+</body>
